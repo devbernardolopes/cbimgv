@@ -12,12 +12,18 @@ class QWheelEvent;
 
 class ImageView : public QWidget
 {
+    Q_OBJECT
+
 public:
     explicit ImageView(const QImage &image, QWidget *parent = nullptr);
 
     void setImage(const QImage &image);
     void fitToWindow();
     void showOriginalSize();
+    qreal zoomPercentage() const;
+
+signals:
+    void zoomChanged(qreal percentage);
 
 protected:
     void paintEvent(QPaintEvent *event) override;

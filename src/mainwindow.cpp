@@ -4,7 +4,9 @@
 #include <QFileInfo>
 #include <QImageReader>
 #include <QKeyEvent>
+#include <QLabel>
 #include <QMessageBox>
+#include <QStatusBar>
 
 MainWindow::MainWindow(
     const QImage &image,
@@ -19,6 +21,22 @@ MainWindow::MainWindow(
 
     m_imageView = new ImageView(image);
     setCentralWidget(m_imageView);
+
+    m_fileNameLabel = new QLabel(this);
+    m_dimensionsLabel = new QLabel(this);
+    m_zoomLabel = new QLabel(this);
+    statusBar()->addWidget(m_fileNameLabel, 1);
+    statusBar()->addPermanentWidget(m_dimensionsLabel);
+    statusBar()->addPermanentWidget(m_zoomLabel);
+
+    connect(
+        m_imageView,
+        &ImageView::zoomChanged,
+        this,
+        &MainWindow::updateZoomStatus
+    );
+    updateImageStatus(image, imagePath);
+    updateZoomStatus(m_imageView->zoomPercentage());
 }
 
 void MainWindow::keyPressEvent(QKeyEvent *event)
@@ -91,4 +109,21 @@ void MainWindow::navigateTo(const QString &imagePath)
 
     m_imageView->setImage(image);
     setWindowTitle(QFileInfo(imagePath).fileName() + " - cbimgv");
+    updateImageStatus(image, imagePath);
+}
+
+void MainWindow::updateImageStatus(
+    const QImage &image,
+    const QString &imagePath
+)
+{
+    m_fileNameLabel->setText(QFileInfo(imagePath).fileName());
+    m_dimensionsLabel->setText(
+        QString("%1 x %2").arg(image.width()).arg(image.height())
+    );
+}
+
+void MainWindow::updateZoomStatus(qreal percentage)
+{
+    m_zoomLabel->setText(QString("%1%").arg(qRound(percentage)));
 }

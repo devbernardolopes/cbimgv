@@ -35,6 +35,7 @@ void ImageView::fitToWindow()
     m_isPanning = false;
     updateCursor();
     update();
+    emit zoomChanged(zoomPercentage());
 }
 
 void ImageView::showOriginalSize()
@@ -45,6 +46,12 @@ void ImageView::showOriginalSize()
     m_isPanning = false;
     updateCursor();
     update();
+    emit zoomChanged(zoomPercentage());
+}
+
+qreal ImageView::zoomPercentage() const
+{
+    return scaleFactor() * 100.0;
 }
 
 qreal ImageView::fitScaleFactor() const
@@ -182,6 +189,7 @@ void ImageView::resizeEvent(QResizeEvent *event)
         m_panOffset = constrainedPanOffset(m_panOffset);
     }
     updateCursor();
+    emit zoomChanged(zoomPercentage());
 }
 
 void ImageView::wheelEvent(QWheelEvent *event)
@@ -226,5 +234,6 @@ void ImageView::wheelEvent(QWheelEvent *event)
 
     updateCursor();
     update();
+    emit zoomChanged(zoomPercentage());
     event->accept();
 }
