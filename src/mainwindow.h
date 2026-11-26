@@ -1,11 +1,15 @@
 #pragma once
 
 #include <QMainWindow>
+#include <QImage>
+#include <QString>
 
 class MainWindow : public QMainWindow
 {
-  Q_OBJECT
-
 public:
-  explicit MainWindow(QWidget *parent = nullptr);
+    explicit MainWindow(
+        const QImage &image,
+        const QString &imagePath,
+        QWidget *parent = nullptr
+    );
 };

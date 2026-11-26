@@ -16,6 +16,8 @@ qt_add_executable(cbimgv
   src/main.cpp
   src/mainwindow.h
   src/mainwindow.cpp
+  src/imageview.h
+  src/imageview.cpp
 )
 
 target_link_libraries(cbimgv PRIVATE

@@ -1,16 +1,19 @@
 #include "mainwindow.h"
+#include "imageview.h"
 
-#include <QLabel>
+#include <QFileInfo>
 
-MainWindow::MainWindow(QWidget *parent)
-  : QMainWindow(parent)
+MainWindow::MainWindow(
+    const QImage &image,
+    const QString &imagePath,
+    QWidget *parent
+)
+    : QMainWindow(parent)
 {
-  setWindowTitle("cbimgv");
-  resize(800, 600);
+    setWindowTitle(QFileInfo(imagePath).fileName() + " - cbimgv");
+    resize(800, 600);
 
-  auto *label = new QLabel("Hello, Qt 6!");
+    auto *imageView = new ImageView(image);
 
-  label->setAlignment(Qt::AlignCenter);
-
-  setCentralWidget(label);
+    setCentralWidget(imageView);
 }
