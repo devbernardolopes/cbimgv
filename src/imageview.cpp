@@ -14,6 +14,7 @@ namespace
 constexpr qreal ZoomStep = 1.2;
 constexpr qreal MinimumZoomFactor = 0.01;
 constexpr qreal MaximumZoomFactor = 1000.0;
+constexpr qreal NavigationAreaWidth = 48.0;
 }
 
 ImageView::ImageView(const QImage &image, QWidget *parent)
@@ -33,6 +34,7 @@ void ImageView::fitToWindow()
     m_fitToWindow = true;
     m_panOffset = {};
     m_isPanning = false;
+    m_pressedEdgeNavigation = EdgeNavigation::None;
     updateCursor();
     update();
     emit zoomChanged(zoomPercentage());
@@ -44,6 +46,7 @@ void ImageView::showOriginalSize()
     m_zoomFactor = 1.0;
     m_panOffset = {};
     m_isPanning = false;
+    m_pressedEdgeNavigation = EdgeNavigation::None;
     updateCursor();
     update();
     emit zoomChanged(zoomPercentage());
@@ -91,6 +94,17 @@ bool ImageView::canPan() const
     return scaledSize.width() > width() || scaledSize.height() > height();
 }
 
+ImageView::EdgeNavigation ImageView::edgeNavigationAt(qreal x) const
+{
+    if (x < NavigationAreaWidth) {
+        return EdgeNavigation::Previous;
+    }
+    if (x >= width() - NavigationAreaWidth) {
+        return EdgeNavigation::Next;
+    }
+    return EdgeNavigation::None;
+}
+
 QPointF ImageView::constrainedPanOffset(const QPointF &offset) const
 {
     const QSizeF scaledSize = QSizeF(m_image.size()) * scaleFactor();
@@ -135,7 +149,16 @@ void ImageView::paintEvent(QPaintEvent *event)
 void ImageView::mouseDoubleClickEvent(QMouseEvent *event)
 {
     if (event->button() == Qt::LeftButton) {
-        showOriginalSize();
+        const EdgeNavigation edge = edgeNavigationAt(event->position().x());
+        if (edge == EdgeNavigation::Previous) {
+            emit previousImageRequested();
+        } else if (edge == EdgeNavigation::Next) {
+            emit nextImageRequested();
+        } else if (m_fitToWindow) {
+            showOriginalSize();
+        } else {
+            fitToWindow();
+        }
         event->accept();
         return;
     }
@@ -145,6 +168,11 @@ void ImageView::mouseDoubleClickEvent(QMouseEvent *event)
 
 void ImageView::mouseMoveEvent(QMouseEvent *event)
 {
+    if (m_pressedEdgeNavigation != EdgeNavigation::None) {
+        event->accept();
+        return;
+    }
+
     if (!m_isPanning) {
         QWidget::mouseMoveEvent(event);
         return;
@@ -159,6 +187,14 @@ void ImageView::mouseMoveEvent(QMouseEvent *event)
 
 void ImageView::mousePressEvent(QMouseEvent *event)
 {
+    if (event->button() == Qt::LeftButton) {
+        m_pressedEdgeNavigation = edgeNavigationAt(event->position().x());
+        if (m_pressedEdgeNavigation != EdgeNavigation::None) {
+            event->accept();
+            return;
+        }
+    }
+
     if (event->button() == Qt::LeftButton && canPan()) {
         m_isPanning = true;
         m_lastPanPosition = event->position();
@@ -172,6 +208,21 @@ void ImageView::mousePressEvent(QMouseEvent *event)
 
 void ImageView::mouseReleaseEvent(QMouseEvent *event)
 {
+    if (event->button() == Qt::LeftButton
+        && m_pressedEdgeNavigation != EdgeNavigation::None) {
+        const EdgeNavigation pressedEdge = m_pressedEdgeNavigation;
+        m_pressedEdgeNavigation = EdgeNavigation::None;
+        if (edgeNavigationAt(event->position().x()) == pressedEdge) {
+            if (pressedEdge == EdgeNavigation::Previous) {
+                emit previousImageRequested();
+            } else {
+                emit nextImageRequested();
+            }
+        }
+        event->accept();
+        return;
+    }
+
     if (event->button() == Qt::LeftButton && m_isPanning) {
         m_isPanning = false;
         updateCursor();
@@ -219,18 +270,8 @@ void ImageView::wheelEvent(QWheelEvent *event)
         maximumScale
     );
 
-    const QRectF oldImageRect = imageRect();
-    const QPointF imagePosition =
-        (event->position() - oldImageRect.topLeft()) / currentScale;
-
     m_zoomFactor = newScale;
     m_fitToWindow = false;
-
-    const QSizeF newSize = QSizeF(m_image.size()) * newScale;
-    QRectF centeredRect(QPointF(0, 0), newSize);
-    centeredRect.moveCenter(QRectF(rect()).center());
-    m_panOffset =
-        event->position() - imagePosition * newScale - centeredRect.topLeft();
 
     updateCursor();
     update();

@@ -31,6 +31,18 @@ MainWindow::MainWindow(
 
     connect(
         m_imageView,
+        &ImageView::previousImageRequested,
+        this,
+        [this] { navigateTo(m_navigator.previousPath()); }
+    );
+    connect(
+        m_imageView,
+        &ImageView::nextImageRequested,
+        this,
+        [this] { navigateTo(m_navigator.nextPath()); }
+    );
+    connect(
+        m_imageView,
         &ImageView::zoomChanged,
         this,
         &MainWindow::updateZoomStatus

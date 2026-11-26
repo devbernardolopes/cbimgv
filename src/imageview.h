@@ -24,6 +24,8 @@ public:
 
 signals:
     void zoomChanged(qreal percentage);
+    void previousImageRequested();
+    void nextImageRequested();
 
 protected:
     void paintEvent(QPaintEvent *event) override;
@@ -35,10 +37,18 @@ protected:
     void wheelEvent(QWheelEvent *event) override;
 
 private:
+    enum class EdgeNavigation
+    {
+        None,
+        Previous,
+        Next
+    };
+
     qreal fitScaleFactor() const;
     qreal scaleFactor() const;
     QRectF imageRect() const;
     bool canPan() const;
+    EdgeNavigation edgeNavigationAt(qreal x) const;
     QPointF constrainedPanOffset(const QPointF &offset) const;
     void updateCursor();
 
@@ -48,4 +58,5 @@ private:
     bool m_fitToWindow = true;
     bool m_isPanning = false;
     QPointF m_lastPanPosition;
+    EdgeNavigation m_pressedEdgeNavigation = EdgeNavigation::None;
 };
