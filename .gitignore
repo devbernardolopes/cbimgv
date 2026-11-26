@@ -1,0 +1,11 @@
+# CMake build output
+build/
+cmake-build-*/
+
+# VS Code workspace settings
+.vscode/
+
+# Compiled binaries
+*.o
+*.a
+*.so
