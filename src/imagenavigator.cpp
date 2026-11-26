@@ -60,6 +60,16 @@ QString ImageNavigator::currentPath() const
     return m_imagePaths.at(m_currentIndex);
 }
 
+QString ImageNavigator::firstPath() const
+{
+    return m_imagePaths.first();
+}
+
+QString ImageNavigator::lastPath() const
+{
+    return m_imagePaths.last();
+}
+
 QString ImageNavigator::nextPath() const
 {
     const qsizetype nextIndex = (m_currentIndex + 1) % m_imagePaths.size();

@@ -9,6 +9,8 @@ public:
     explicit ImageNavigator(const QString &imagePath);
 
     QString currentPath() const;
+    QString firstPath() const;
+    QString lastPath() const;
     QString nextPath() const;
     QString previousPath() const;
     bool setCurrentPath(const QString &imagePath);

@@ -24,12 +24,36 @@ MainWindow::MainWindow(
 void MainWindow::keyPressEvent(QKeyEvent *event)
 {
     switch (event->key()) {
+    case Qt::Key_Escape:
+        close();
+        event->accept();
+        return;
     case Qt::Key_Left:
         navigateTo(m_navigator.previousPath());
         event->accept();
         return;
     case Qt::Key_Right:
         navigateTo(m_navigator.nextPath());
+        event->accept();
+        return;
+    case Qt::Key_Home:
+        navigateTo(m_navigator.firstPath());
+        event->accept();
+        return;
+    case Qt::Key_End:
+        navigateTo(m_navigator.lastPath());
+        event->accept();
+        return;
+    case Qt::Key_F11:
+        isFullScreen() ? showNormal() : showFullScreen();
+        event->accept();
+        return;
+    case Qt::Key_F:
+        m_imageView->fitToWindow();
+        event->accept();
+        return;
+    case Qt::Key_1:
+        m_imageView->showOriginalSize();
         event->accept();
         return;
     default:
