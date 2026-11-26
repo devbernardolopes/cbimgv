@@ -10,6 +10,7 @@ class ImageView : public QWidget
 public:
     explicit ImageView(const QImage &image, QWidget *parent = nullptr);
 
+    void setImage(const QImage &image);
     void fitToWindow();
     void showOriginalSize();
 

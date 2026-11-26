@@ -14,6 +14,8 @@ qt_standard_project_setup()
 
 qt_add_executable(cbimgv
   src/main.cpp
+  src/imagenavigator.h
+  src/imagenavigator.cpp
   src/mainwindow.h
   src/mainwindow.cpp
   src/imageview.h

@@ -12,6 +12,12 @@ ImageView::ImageView(const QImage &image, QWidget *parent)
 {
 }
 
+void ImageView::setImage(const QImage &image)
+{
+    m_image = image;
+    fitToWindow();
+}
+
 void ImageView::fitToWindow()
 {
     m_fitToWindow = true;
