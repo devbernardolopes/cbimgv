@@ -8,6 +8,7 @@
 #include <QFileInfo>
 #include <QImageReader>
 #include <QKeyEvent>
+#include <QKeySequence>
 #include <QLabel>
 #include <QVBoxLayout>
 #include <QWidget>
@@ -98,6 +99,12 @@ MainWindow::MainWindow(
 
 void MainWindow::keyPressEvent(QKeyEvent *event)
 {
+    if (event->matches(QKeySequence::Copy)) {
+        m_imageView->copyToClipboard();
+        event->accept();
+        return;
+    }
+
     switch (event->key()) {
     case Qt::Key_Escape:
         close();

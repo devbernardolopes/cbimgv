@@ -26,6 +26,7 @@ public:
     void clearImage();
     void fitToWindow();
     void showOriginalSize();
+    void copyToClipboard() const;
     qreal zoomPercentage() const;
 
 signals:

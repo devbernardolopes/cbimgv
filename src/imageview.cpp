@@ -1,12 +1,15 @@
 #include "imageview.h"
 
 #include <QApplication>
+#include <QClipboard>
 #include <QDrag>
 #include <QMimeData>
 #include <QMouseEvent>
 #include <QPainter>
 #include <QPaintEvent>
+#include <QPixmap>
 #include <QResizeEvent>
+#include <QSize>
 #include <QUrl>
 #include <QWheelEvent>
 
@@ -19,6 +22,7 @@ constexpr qreal ZoomStep = 1.2;
 constexpr qreal MinimumZoomFactor = 0.01;
 constexpr qreal MaximumZoomFactor = 1000.0;
 constexpr qreal NavigationAreaWidth = 48.0;
+constexpr int DragPreviewMaxSize = 96;
 }
 
 ImageView::ImageView(
@@ -69,6 +73,18 @@ void ImageView::showOriginalSize()
     updateCursor();
     update();
     emit zoomChanged(zoomPercentage());
+}
+
+void ImageView::copyToClipboard() const
+{
+    if (m_image.isNull() || m_imagePath.isEmpty()) {
+        return;
+    }
+
+    auto *mimeData = new QMimeData;
+    mimeData->setImageData(m_image);
+    mimeData->setUrls({QUrl::fromLocalFile(m_imagePath)});
+    QApplication::clipboard()->setMimeData(mimeData);
 }
 
 qreal ImageView::zoomPercentage() const
@@ -199,6 +215,16 @@ void ImageView::mouseMoveEvent(QMouseEvent *event)
         auto *mimeData = new QMimeData;
         mimeData->setUrls({QUrl::fromLocalFile(m_imagePath)});
         drag.setMimeData(mimeData);
+        const QPixmap dragPixmap = QPixmap::fromImage(m_image.scaled(
+            QSize(DragPreviewMaxSize, DragPreviewMaxSize),
+            Qt::KeepAspectRatio,
+            Qt::SmoothTransformation
+        ));
+        drag.setPixmap(dragPixmap);
+        drag.setHotSpot(QPoint(
+            dragPixmap.width() / 2,
+            dragPixmap.height() / 2
+        ));
         drag.exec(Qt::CopyAction);
 
         event->accept();

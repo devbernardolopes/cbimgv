@@ -8,10 +8,13 @@ controls.
 
 This project is in active development. It currently uses Qt Widgets to open,
 display, zoom, pan, and navigate images in the same directory. When the image
-does not need panning, it can also be dragged to another application as a file.
+does not need panning, it can also be dragged to another application as a file,
+with a thumbnail shown beside the cursor. Ctrl+C copies both the image and its
+file reference for pasting into other applications.
 
 ## Keyboard navigation
 
+- Ctrl+C: copy the current image and its file reference.
 - Left/Right: move to the previous/next image, wrapping at either end.
 - Page Up/Page Down: move back/forward 10 images, clamping to the first or
   last image. From the first/last image, the shortcut wraps by 10 instead.
