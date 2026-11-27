@@ -13,6 +13,7 @@ public:
     QString lastPath() const;
     QString nextPath() const;
     QString previousPath() const;
+    QString pathAtOffset(qsizetype offset) const;
     QStringList imagePaths() const;
     qsizetype currentIndex() const;
     QString directoryPath() const;

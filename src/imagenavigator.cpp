@@ -112,6 +112,31 @@ QString ImageNavigator::previousPath() const
     return m_imagePaths.at(previousIndex);
 }
 
+QString ImageNavigator::pathAtOffset(qsizetype offset) const
+{
+    if (m_imagePaths.isEmpty()) {
+        return {};
+    }
+
+    const qsizetype lastIndex = m_imagePaths.size() - 1;
+    qsizetype targetIndex;
+    if ((offset < 0 && m_currentIndex == 0)
+        || (offset > 0 && m_currentIndex == lastIndex)) {
+        targetIndex = (m_currentIndex + offset) % m_imagePaths.size();
+        if (targetIndex < 0) {
+            targetIndex += m_imagePaths.size();
+        }
+    } else {
+        targetIndex = std::clamp(
+            m_currentIndex + offset,
+            qsizetype(0),
+            lastIndex
+        );
+    }
+
+    return m_imagePaths.at(targetIndex);
+}
+
 QStringList ImageNavigator::imagePaths() const
 {
     return m_imagePaths;

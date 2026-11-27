@@ -127,6 +127,14 @@ void MainWindow::keyPressEvent(QKeyEvent *event)
         }
         event->accept();
         return;
+    case Qt::Key_PageUp:
+        navigateTo(m_navigator.pathAtOffset(-10));
+        event->accept();
+        return;
+    case Qt::Key_PageDown:
+        navigateTo(m_navigator.pathAtOffset(10));
+        event->accept();
+        return;
     case Qt::Key_F11:
         isFullScreen() ? showNormal() : showFullScreen();
         event->accept();
