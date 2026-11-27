@@ -19,7 +19,7 @@ MainWindow::MainWindow(
     setWindowTitle(QFileInfo(imagePath).fileName() + " - cbimgv");
     resize(800, 600);
 
-    m_imageView = new ImageView(image);
+    m_imageView = new ImageView(image, m_navigator.currentPath());
     setCentralWidget(m_imageView);
 
     m_fileNameLabel = new QLabel(this);
@@ -119,7 +119,7 @@ void MainWindow::navigateTo(const QString &imagePath)
         return;
     }
 
-    m_imageView->setImage(image);
+    m_imageView->setImage(image, imagePath);
     setWindowTitle(QFileInfo(imagePath).fileName() + " - cbimgv");
     updateImageStatus(image, imagePath);
 }

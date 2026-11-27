@@ -1,9 +1,13 @@
 #include "imageview.h"
 
+#include <QApplication>
+#include <QDrag>
+#include <QMimeData>
 #include <QMouseEvent>
 #include <QPainter>
 #include <QPaintEvent>
 #include <QResizeEvent>
+#include <QUrl>
 #include <QWheelEvent>
 
 #include <algorithm>
@@ -17,15 +21,21 @@ constexpr qreal MaximumZoomFactor = 1000.0;
 constexpr qreal NavigationAreaWidth = 48.0;
 }
 
-ImageView::ImageView(const QImage &image, QWidget *parent)
+ImageView::ImageView(
+    const QImage &image,
+    const QString &imagePath,
+    QWidget *parent
+)
     : QWidget(parent),
-      m_image(image)
+      m_image(image),
+      m_imagePath(imagePath)
 {
 }
 
-void ImageView::setImage(const QImage &image)
+void ImageView::setImage(const QImage &image, const QString &imagePath)
 {
     m_image = image;
+    m_imagePath = imagePath;
     fitToWindow();
 }
 
@@ -34,6 +44,7 @@ void ImageView::fitToWindow()
     m_fitToWindow = true;
     m_panOffset = {};
     m_isPanning = false;
+    m_isDragCandidate = false;
     m_pressedEdgeNavigation = EdgeNavigation::None;
     updateCursor();
     update();
@@ -46,6 +57,7 @@ void ImageView::showOriginalSize()
     m_zoomFactor = 1.0;
     m_panOffset = {};
     m_isPanning = false;
+    m_isDragCandidate = false;
     m_pressedEdgeNavigation = EdgeNavigation::None;
     updateCursor();
     update();
@@ -168,6 +180,24 @@ void ImageView::mouseDoubleClickEvent(QMouseEvent *event)
 
 void ImageView::mouseMoveEvent(QMouseEvent *event)
 {
+    if (m_isDragCandidate
+        && !canPan()
+        && (event->buttons() & Qt::LeftButton)
+        && (event->position() - m_dragStartPosition).manhattanLength()
+            >= QApplication::startDragDistance()) {
+        m_isDragCandidate = false;
+        m_pressedEdgeNavigation = EdgeNavigation::None;
+
+        QDrag drag(this);
+        auto *mimeData = new QMimeData;
+        mimeData->setUrls({QUrl::fromLocalFile(m_imagePath)});
+        drag.setMimeData(mimeData);
+        drag.exec(Qt::CopyAction);
+
+        event->accept();
+        return;
+    }
+
     if (m_pressedEdgeNavigation != EdgeNavigation::None) {
         event->accept();
         return;
@@ -189,10 +219,14 @@ void ImageView::mousePressEvent(QMouseEvent *event)
 {
     if (event->button() == Qt::LeftButton) {
         m_pressedEdgeNavigation = edgeNavigationAt(event->position().x());
-        if (m_pressedEdgeNavigation != EdgeNavigation::None) {
-            event->accept();
-            return;
-        }
+        m_dragStartPosition = event->position();
+        m_isDragCandidate = !canPan() && imageRect().contains(event->position());
+    }
+
+    if (event->button() == Qt::LeftButton
+        && m_pressedEdgeNavigation != EdgeNavigation::None) {
+        event->accept();
+        return;
     }
 
     if (event->button() == Qt::LeftButton && canPan()) {
@@ -212,6 +246,7 @@ void ImageView::mouseReleaseEvent(QMouseEvent *event)
         && m_pressedEdgeNavigation != EdgeNavigation::None) {
         const EdgeNavigation pressedEdge = m_pressedEdgeNavigation;
         m_pressedEdgeNavigation = EdgeNavigation::None;
+        m_isDragCandidate = false;
         if (edgeNavigationAt(event->position().x()) == pressedEdge) {
             if (pressedEdge == EdgeNavigation::Previous) {
                 emit previousImageRequested();
@@ -226,6 +261,12 @@ void ImageView::mouseReleaseEvent(QMouseEvent *event)
     if (event->button() == Qt::LeftButton && m_isPanning) {
         m_isPanning = false;
         updateCursor();
+        event->accept();
+        return;
+    }
+
+    if (event->button() == Qt::LeftButton && m_isDragCandidate) {
+        m_isDragCandidate = false;
         event->accept();
         return;
     }
