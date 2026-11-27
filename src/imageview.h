@@ -26,6 +26,7 @@ public:
     void clearImage();
     void fitToWindow();
     void showOriginalSize();
+    void toggleWheelNavigation();
     void copyToClipboard() const;
     qreal zoomPercentage() const;
 
@@ -65,6 +66,8 @@ private:
     QPointF m_panOffset;
     bool m_fitToWindow = true;
     bool m_isPanning = false;
+    bool m_wheelNavigatesImages = false;
+    qreal m_wheelNavigationRemainder = 0.0;
     QPointF m_lastPanPosition;
     bool m_isDragCandidate = false;
     QPointF m_dragStartPosition;

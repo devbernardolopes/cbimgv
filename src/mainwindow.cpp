@@ -11,6 +11,7 @@
 #include <QKeyEvent>
 #include <QKeySequence>
 #include <QLabel>
+#include <QMouseEvent>
 #include <QVBoxLayout>
 #include <QWidget>
 #include <QMessageBox>
@@ -119,6 +120,14 @@ void MainWindow::keyPressEvent(QKeyEvent *event)
         close();
         event->accept();
         return;
+    case Qt::Key_Tab:
+        if (event->modifiers() == Qt::NoModifier) {
+            m_imageView->toggleWheelNavigation();
+            event->accept();
+            return;
+        }
+        QMainWindow::keyPressEvent(event);
+        return;
     case Qt::Key_Left:
         if (!m_navigator.imagePaths().isEmpty()) {
             navigateTo(m_navigator.previousPath());
@@ -198,19 +207,26 @@ void MainWindow::deleteCurrentImage(bool permanently)
 
 bool MainWindow::eventFilter(QObject *watched, QEvent *event)
 {
-    if (event->type() != QEvent::KeyPress) {
-        return QMainWindow::eventFilter(watched, event);
-    }
-
     auto *widget = qobject_cast<QWidget *>(watched);
     if (watched != this
         && (!widget || (widget != this && !isAncestorOf(widget)))) {
         return QMainWindow::eventFilter(watched, event);
     }
 
-    auto *keyEvent = static_cast<QKeyEvent *>(event);
-    keyPressEvent(keyEvent);
-    return keyEvent->isAccepted();
+    if (event->type() == QEvent::MouseButtonPress) {
+        auto *mouseEvent = static_cast<QMouseEvent *>(event);
+        if (mouseEvent->button() == Qt::RightButton) {
+            close();
+            mouseEvent->accept();
+            return true;
+        }
+    } else if (event->type() == QEvent::KeyPress) {
+        auto *keyEvent = static_cast<QKeyEvent *>(event);
+        keyPressEvent(keyEvent);
+        return keyEvent->isAccepted();
+    }
+
+    return QMainWindow::eventFilter(watched, event);
 }
 
 void MainWindow::navigateTo(

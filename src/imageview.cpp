@@ -75,6 +75,12 @@ void ImageView::showOriginalSize()
     emit zoomChanged(zoomPercentage());
 }
 
+void ImageView::toggleWheelNavigation()
+{
+    m_wheelNavigatesImages = !m_wheelNavigatesImages;
+    m_wheelNavigationRemainder = 0.0;
+}
+
 void ImageView::copyToClipboard() const
 {
     if (m_image.isNull() || m_imagePath.isEmpty()) {
@@ -328,6 +334,24 @@ void ImageView::wheelEvent(QWheelEvent *event)
         return;
     }
 
+    if (m_wheelNavigatesImages
+        && !event->modifiers().testFlag(Qt::ControlModifier)) {
+        m_wheelNavigationRemainder += angleDelta != 0
+            ? static_cast<qreal>(angleDelta)
+            : static_cast<qreal>(pixelDelta) * 3.0;
+        while (m_wheelNavigationRemainder >= 120.0) {
+            emit previousImageRequested();
+            m_wheelNavigationRemainder -= 120.0;
+        }
+        while (m_wheelNavigationRemainder <= -120.0) {
+            emit nextImageRequested();
+            m_wheelNavigationRemainder += 120.0;
+        }
+        event->accept();
+        return;
+    }
+
+    m_wheelNavigationRemainder = 0.0;
     const qreal zoomSteps = angleDelta != 0
         ? static_cast<qreal>(angleDelta) / 120.0
         : static_cast<qreal>(pixelDelta) / 40.0;
