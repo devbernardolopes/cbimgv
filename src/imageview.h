@@ -26,6 +26,8 @@ public:
     void clearImage();
     void fitToWindow();
     void showOriginalSize();
+    void zoomIn();
+    void zoomOut();
     void toggleWheelNavigation();
     void copyToClipboard() const;
     qreal zoomPercentage() const;
@@ -54,6 +56,7 @@ private:
 
     qreal fitScaleFactor() const;
     qreal scaleFactor() const;
+    void zoomBySteps(qreal steps);
     QRectF imageRect() const;
     bool canPan() const;
     EdgeNavigation edgeNavigationAt(qreal x) const;

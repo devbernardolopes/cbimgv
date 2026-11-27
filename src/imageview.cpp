@@ -75,6 +75,40 @@ void ImageView::showOriginalSize()
     emit zoomChanged(zoomPercentage());
 }
 
+void ImageView::zoomIn()
+{
+    zoomBySteps(1.0);
+}
+
+void ImageView::zoomOut()
+{
+    zoomBySteps(-1.0);
+}
+
+void ImageView::zoomBySteps(qreal steps)
+{
+    const qreal currentScale = scaleFactor();
+    if (m_image.isNull() || currentScale <= 0.0 || steps == 0.0) {
+        return;
+    }
+
+    const qreal requestedScale = currentScale * std::pow(ZoomStep, steps);
+    const qreal fitScale = fitScaleFactor();
+    const qreal minimumScale =
+        std::min(MinimumZoomFactor, fitScale / 100.0);
+    const qreal maximumScale =
+        std::max(MaximumZoomFactor, fitScale * MaximumZoomFactor);
+    m_zoomFactor = std::clamp(requestedScale, minimumScale, maximumScale);
+    m_fitToWindow = false;
+    if (!canPan()) {
+        m_panOffset = {};
+    }
+
+    updateCursor();
+    update();
+    emit zoomChanged(zoomPercentage());
+}
+
 void ImageView::toggleWheelNavigation()
 {
     m_wheelNavigatesImages = !m_wheelNavigatesImages;
@@ -355,27 +389,6 @@ void ImageView::wheelEvent(QWheelEvent *event)
     const qreal zoomSteps = angleDelta != 0
         ? static_cast<qreal>(angleDelta) / 120.0
         : static_cast<qreal>(pixelDelta) / 40.0;
-    const qreal requestedScale =
-        currentScale * std::pow(ZoomStep, zoomSteps);
-    const qreal fitScale = fitScaleFactor();
-    const qreal minimumScale =
-        std::min(MinimumZoomFactor, fitScale / 100.0);
-    const qreal maximumScale =
-        std::max(MaximumZoomFactor, fitScale * MaximumZoomFactor);
-    const qreal newScale = std::clamp(
-        requestedScale,
-        minimumScale,
-        maximumScale
-    );
-
-    m_zoomFactor = newScale;
-    m_fitToWindow = false;
-    if (!canPan()) {
-        m_panOffset = {};
-    }
-
-    updateCursor();
-    update();
-    emit zoomChanged(zoomPercentage());
+    zoomBySteps(zoomSteps);
     event->accept();
 }

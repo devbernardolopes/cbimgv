@@ -20,6 +20,9 @@ file reference for pasting into other applications.
 - Tab: toggle the mouse wheel between zooming and image navigation (up for
   previous, down for next).
 - Ctrl+mouse wheel: zoom regardless of the current wheel mode.
+- G: toggle the thumbnail ribbon.
+- S: toggle the status bar.
+- Plus/Minus: zoom in/out.
 - Right-click: quit cbimgv.
 - Left/Right: move to the previous/next image, wrapping at either end.
 - Page Up/Page Down: move back/forward 10 images, clamping to the first or

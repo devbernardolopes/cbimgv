@@ -11,6 +11,8 @@
 #include <QResizeEvent>
 #include <QScrollBar>
 #include <QSet>
+#include <QShowEvent>
+#include <QTimer>
 
 namespace
 {
@@ -153,8 +155,21 @@ void ThumbnailRibbon::setSelectedIndex(qsizetype index)
 void ThumbnailRibbon::resizeEvent(QResizeEvent *event)
 {
     QWidget::resizeEvent(event);
-    centerSelectedThumbnail();
-    updateVisibleThumbnails();
+    scheduleVisibleThumbnailUpdate();
+}
+
+void ThumbnailRibbon::showEvent(QShowEvent *event)
+{
+    QWidget::showEvent(event);
+    scheduleVisibleThumbnailUpdate();
+}
+
+void ThumbnailRibbon::scheduleVisibleThumbnailUpdate()
+{
+    QTimer::singleShot(0, this, [this] {
+        centerSelectedThumbnail();
+        updateVisibleThumbnails();
+    });
 }
 
 void ThumbnailRibbon::thumbnailLoaded(

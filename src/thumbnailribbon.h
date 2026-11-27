@@ -10,6 +10,7 @@
 
 class QHBoxLayout;
 class QPushButton;
+class QShowEvent;
 
 class ThumbnailRibbon : public QWidget
 {
@@ -31,6 +32,7 @@ public slots:
 
 protected:
     void resizeEvent(QResizeEvent *event) override;
+    void showEvent(QShowEvent *event) override;
 
 private slots:
     void updateVisibleThumbnails();
@@ -39,6 +41,7 @@ private:
     void loadThumbnail(const QString &path);
     void centerSelectedThumbnail();
     void invalidateChangedCache(const QStringList &paths);
+    void scheduleVisibleThumbnailUpdate();
 
     QListWidget *m_list = nullptr;
     QPushButton *m_previousButton = nullptr;

@@ -128,6 +128,31 @@ void MainWindow::keyPressEvent(QKeyEvent *event)
         }
         QMainWindow::keyPressEvent(event);
         return;
+    case Qt::Key_G:
+        m_thumbnailRibbon->setVisible(m_thumbnailRibbon->isHidden());
+        event->accept();
+        return;
+    case Qt::Key_S:
+        statusBar()->setVisible(statusBar()->isHidden());
+        event->accept();
+        return;
+    case Qt::Key_Plus:
+        m_imageView->zoomIn();
+        event->accept();
+        return;
+    case Qt::Key_Equal:
+        if (event->modifiers().testFlag(Qt::ShiftModifier)
+            || event->text() == QStringLiteral("+")) {
+            m_imageView->zoomIn();
+            event->accept();
+            return;
+        }
+        QMainWindow::keyPressEvent(event);
+        return;
+    case Qt::Key_Minus:
+        m_imageView->zoomOut();
+        event->accept();
+        return;
     case Qt::Key_Left:
         if (!m_navigator.imagePaths().isEmpty()) {
             navigateTo(m_navigator.previousPath());
