@@ -10,6 +10,14 @@
 
 ImageNavigator::ImageNavigator(const QString &imagePath)
 {
+    reload(imagePath);
+}
+
+void ImageNavigator::reload(const QString &imagePath)
+{
+    m_imagePaths.clear();
+    m_currentIndex = 0;
+
     const QString currentImagePath =
         QDir::cleanPath(QFileInfo(imagePath).absoluteFilePath());
 
@@ -83,11 +91,25 @@ QString ImageNavigator::previousPath() const
     return m_imagePaths.at(previousIndex);
 }
 
+QStringList ImageNavigator::imagePaths() const
+{
+    return m_imagePaths;
+}
+
+qsizetype ImageNavigator::currentIndex() const
+{
+    return m_currentIndex;
+}
+
 bool ImageNavigator::setCurrentPath(const QString &imagePath)
 {
     const QString normalizedPath =
         QDir::cleanPath(QFileInfo(imagePath).absoluteFilePath());
-    const qsizetype index = m_imagePaths.indexOf(normalizedPath);
+    qsizetype index = m_imagePaths.indexOf(normalizedPath);
+    if (index < 0) {
+        reload(normalizedPath);
+        index = m_imagePaths.indexOf(normalizedPath);
+    }
     if (index < 0) {
         return false;
     }

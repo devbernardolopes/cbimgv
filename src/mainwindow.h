@@ -9,6 +9,8 @@
 class QKeyEvent;
 class ImageView;
 class QLabel;
+class ThumbnailRibbon;
+class QWidget;
 
 class MainWindow : public QMainWindow
 {
@@ -29,6 +31,7 @@ private:
 
     ImageNavigator m_navigator;
     ImageView *m_imageView = nullptr;
+    ThumbnailRibbon *m_thumbnailRibbon = nullptr;
     QLabel *m_fileNameLabel = nullptr;
     QLabel *m_dimensionsLabel = nullptr;
     QLabel *m_zoomLabel = nullptr;

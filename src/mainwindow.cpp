@@ -1,10 +1,13 @@
 #include "mainwindow.h"
 #include "imageview.h"
+#include "thumbnailribbon.h"
 
 #include <QFileInfo>
 #include <QImageReader>
 #include <QKeyEvent>
 #include <QLabel>
+#include <QVBoxLayout>
+#include <QWidget>
 #include <QMessageBox>
 #include <QStatusBar>
 
@@ -20,7 +23,19 @@ MainWindow::MainWindow(
     resize(800, 600);
 
     m_imageView = new ImageView(image, m_navigator.currentPath());
-    setCentralWidget(m_imageView);
+    m_thumbnailRibbon = new ThumbnailRibbon(this);
+    m_thumbnailRibbon->setImages(
+        m_navigator.imagePaths(),
+        m_navigator.currentIndex()
+    );
+
+    auto *centralContainer = new QWidget(this);
+    auto *centralLayout = new QVBoxLayout(centralContainer);
+    centralLayout->setContentsMargins(0, 0, 0, 0);
+    centralLayout->setSpacing(0);
+    centralLayout->addWidget(m_imageView, 1);
+    centralLayout->addWidget(m_thumbnailRibbon, 0);
+    setCentralWidget(centralContainer);
 
     m_fileNameLabel = new QLabel(this);
     m_dimensionsLabel = new QLabel(this);
@@ -46,6 +61,24 @@ MainWindow::MainWindow(
         &ImageView::zoomChanged,
         this,
         &MainWindow::updateZoomStatus
+    );
+    connect(
+        m_thumbnailRibbon,
+        &ThumbnailRibbon::imageSelected,
+        this,
+        [this](const QString &imagePath) { navigateTo(imagePath); }
+    );
+    connect(
+        m_thumbnailRibbon,
+        &ThumbnailRibbon::previousImageRequested,
+        this,
+        [this] { navigateTo(m_navigator.previousPath()); }
+    );
+    connect(
+        m_thumbnailRibbon,
+        &ThumbnailRibbon::nextImageRequested,
+        this,
+        [this] { navigateTo(m_navigator.nextPath()); }
     );
     updateImageStatus(image, imagePath);
     updateZoomStatus(m_imageView->zoomPercentage());
@@ -110,6 +143,7 @@ void MainWindow::navigateTo(const QString &imagePath)
         return;
     }
 
+    const QStringList previousPaths = m_navigator.imagePaths();
     if (!m_navigator.setCurrentPath(imagePath)) {
         QMessageBox::warning(
             this,
@@ -120,6 +154,14 @@ void MainWindow::navigateTo(const QString &imagePath)
     }
 
     m_imageView->setImage(image, imagePath);
+    if (m_navigator.imagePaths() != previousPaths) {
+        m_thumbnailRibbon->setImages(
+            m_navigator.imagePaths(),
+            m_navigator.currentIndex()
+        );
+    } else {
+        m_thumbnailRibbon->setSelectedIndex(m_navigator.currentIndex());
+    }
     setWindowTitle(QFileInfo(imagePath).fileName() + " - cbimgv");
     updateImageStatus(image, imagePath);
 }

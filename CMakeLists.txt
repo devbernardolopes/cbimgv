@@ -22,6 +22,8 @@ qt_add_executable(cbimgv
   src/mainwindow.cpp
   src/imageview.h
   src/imageview.cpp
+  src/thumbnailribbon.h
+  src/thumbnailribbon.cpp
 )
 
 target_link_libraries(cbimgv PRIVATE
