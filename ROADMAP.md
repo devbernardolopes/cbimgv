@@ -7,5 +7,6 @@
 5. Mouse interaction: Implement wheel zoom, double-click reset, cursor-centered zoom and image panning.
 6. Keyboard shortcuts: Implement ESC, F11, Home, End and other shortcuts.
 7. Status bar: Display filename, image dimensions and zoom percentage.
-8. Dolphin integration: Create the .desktop entry, register MIME associations and test launching from Dolphin.
-9. Polishing: Test performance, memory usage, image formats, error handling and application behavior.
+8. Linux desktop integration: Create the freedesktop-compatible desktop entry, register supported MIME types, install application icons, and test launching from KDE Dolphin.
+9. Distribution and packaging: CMake installation rules. Arch PKGBUILD. Package installation/removal tests. Versioned release.
+10. Polishing: Performance. Memory usage. Image format compatibility. Error handling. General application testing.
