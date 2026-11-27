@@ -313,6 +313,9 @@ void ImageView::wheelEvent(QWheelEvent *event)
 
     m_zoomFactor = newScale;
     m_fitToWindow = false;
+    if (!canPan()) {
+        m_panOffset = {};
+    }
 
     updateCursor();
     update();
