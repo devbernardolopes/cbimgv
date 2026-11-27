@@ -1,0 +1,10 @@
+[Desktop Entry]
+Type=Application
+Name=cbimgv
+Comment=View and navigate images
+Exec=cbimgv %f
+TryExec=cbimgv
+Icon=cbimgv
+Terminal=false
+Categories=Graphics;Viewer;
+MimeType=image/jpeg;image/png;image/gif;image/webp;image/bmp;image/tiff;image/svg+xml;

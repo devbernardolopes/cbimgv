@@ -1,0 +1,29 @@
+# Maintainer: TBD
+
+# TODO: Before publication, set pkgver to the actual release version and
+# source to the corresponding Git tag/release archive.
+pkgname=cbimgv
+pkgver=0.1.0
+pkgrel=1
+pkgdesc='Lightweight Qt 6 image viewer for Linux'
+arch=('x86_64')
+url='https://github.com/devbernardolopes/cbimgv'
+license=('Apache-2.0')
+depends=('qt6-base')
+makedepends=('cmake' 'ninja')
+
+# TODO: Replace this placeholder before publication. Use the SHA-256 checksum
+# of the verified GitHub release archive for tag v0.1.0.
+source=("https://github.com/devbernardolopes/cbimgv/archive/refs/tags/v${pkgver}.tar.gz")
+sha256sums=('SKIP')
+
+build() {
+  cmake -S "$pkgname-$pkgver" -B build -G Ninja \
+    -DCMAKE_BUILD_TYPE=Release \
+    -DCMAKE_INSTALL_PREFIX=/usr
+  cmake --build build
+}
+
+package() {
+  DESTDIR="$pkgdir" cmake --install build
+}

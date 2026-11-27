@@ -5,6 +5,8 @@ project(cbimgv
   LANGUAGES CXX
 )
 
+include(GNUInstallDirs)
+
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
@@ -24,4 +26,20 @@ qt_add_executable(cbimgv
 
 target_link_libraries(cbimgv PRIVATE
   Qt6::Widgets
+)
+
+install(TARGETS cbimgv
+  RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
+)
+
+install(FILES data/cbimgv.desktop
+  DESTINATION ${CMAKE_INSTALL_DATADIR}/applications
+)
+
+install(FILES data/icons/hicolor/scalable/apps/cbimgv.svg
+  DESTINATION ${CMAKE_INSTALL_DATADIR}/icons/hicolor/scalable/apps
+)
+
+install(FILES LICENSE
+  DESTINATION ${CMAKE_INSTALL_DATADIR}/licenses/cbimgv
 )
