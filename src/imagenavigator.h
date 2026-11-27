@@ -15,11 +15,14 @@ public:
     QString previousPath() const;
     QStringList imagePaths() const;
     qsizetype currentIndex() const;
+    QString directoryPath() const;
+    bool refresh();
     bool setCurrentPath(const QString &imagePath);
 
 private:
     void reload(const QString &imagePath);
 
     QStringList m_imagePaths;
-    qsizetype m_currentIndex = 0;
+    qsizetype m_currentIndex = -1;
+    QString m_directoryPath;
 };

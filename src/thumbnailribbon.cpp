@@ -1,6 +1,7 @@
 #include "thumbnailribbon.h"
 
 #include <QAbstractItemDelegate>
+#include <QFileInfo>
 #include <QHBoxLayout>
 #include <QIcon>
 #include <QImageReader>
@@ -9,6 +10,7 @@
 #include <QPushButton>
 #include <QResizeEvent>
 #include <QScrollBar>
+#include <QSet>
 
 namespace
 {
@@ -119,6 +121,7 @@ void ThumbnailRibbon::setImages(
     qsizetype currentIndex
 )
 {
+    invalidateChangedCache(paths);
     m_paths = paths;
     m_selectedIndex = currentIndex;
     m_list->clear();
@@ -168,6 +171,13 @@ void ThumbnailRibbon::thumbnailLoaded(
         new QImage(thumbnail),
         thumbnail.sizeInBytes()
     );
+    const QFileInfo info(path);
+    m_thumbnailStamps.insert(
+        path,
+        QString("%1:%2")
+            .arg(info.size())
+            .arg(info.lastModified().toMSecsSinceEpoch())
+    );
 
     const qsizetype index = m_paths.indexOf(path);
     if (index >= 0) {
@@ -197,6 +207,39 @@ void ThumbnailRibbon::loadThumbnail(const QString &path)
     }
 
     thumbnailLoaded(path, reader.read());
+}
+
+void ThumbnailRibbon::invalidateChangedCache(const QStringList &paths)
+{
+    QSet<QString> validPaths(paths.begin(), paths.end());
+
+    for (auto it = m_thumbnailStamps.begin();
+         it != m_thumbnailStamps.end();) {
+        if (!validPaths.contains(it.key())) {
+            m_thumbnailCache.remove(it.key());
+            it = m_thumbnailStamps.erase(it);
+            continue;
+        }
+
+        const QFileInfo info(it.key());
+        const QString stamp =
+            QString("%1:%2")
+                .arg(info.size())
+                .arg(info.lastModified().toMSecsSinceEpoch());
+        if (stamp != it.value()) {
+            m_thumbnailCache.remove(it.key());
+            it = m_thumbnailStamps.erase(it);
+            continue;
+        }
+        ++it;
+    }
+
+    for (const QString &path : paths) {
+        if (!m_thumbnailStamps.contains(path)
+            && m_thumbnailCache.contains(path)) {
+            m_thumbnailCache.remove(path);
+        }
+    }
 }
 
 void ThumbnailRibbon::updateVisibleThumbnails()

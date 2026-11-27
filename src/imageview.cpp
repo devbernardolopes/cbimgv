@@ -39,6 +39,13 @@ void ImageView::setImage(const QImage &image, const QString &imagePath)
     fitToWindow();
 }
 
+void ImageView::clearImage()
+{
+    m_image = {};
+    m_imagePath.clear();
+    fitToWindow();
+}
+
 void ImageView::fitToWindow()
 {
     m_fitToWindow = true;

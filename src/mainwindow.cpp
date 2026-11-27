@@ -1,6 +1,7 @@
 #include "mainwindow.h"
 #include "imageview.h"
 #include "thumbnailribbon.h"
+#include "directorywatcher.h"
 
 #include <QApplication>
 #include <QEvent>
@@ -30,6 +31,8 @@ MainWindow::MainWindow(
         m_navigator.imagePaths(),
         m_navigator.currentIndex()
     );
+    m_directoryWatcher = new DirectoryWatcher(this);
+    m_directoryWatcher->setDirectory(m_navigator.directoryPath());
     QApplication::instance()->installEventFilter(this);
 
     auto *centralContainer = new QWidget(this);
@@ -83,6 +86,12 @@ MainWindow::MainWindow(
         this,
         [this] { navigateTo(m_navigator.nextPath()); }
     );
+    connect(
+        m_directoryWatcher,
+        &DirectoryWatcher::directoryChanged,
+        this,
+        &MainWindow::refreshDirectory
+    );
     updateImageStatus(image, imagePath);
     updateZoomStatus(m_imageView->zoomPercentage());
 }
@@ -95,19 +104,27 @@ void MainWindow::keyPressEvent(QKeyEvent *event)
         event->accept();
         return;
     case Qt::Key_Left:
-        navigateTo(m_navigator.previousPath());
+        if (!m_navigator.imagePaths().isEmpty()) {
+            navigateTo(m_navigator.previousPath());
+        }
         event->accept();
         return;
     case Qt::Key_Right:
-        navigateTo(m_navigator.nextPath());
+        if (!m_navigator.imagePaths().isEmpty()) {
+            navigateTo(m_navigator.nextPath());
+        }
         event->accept();
         return;
     case Qt::Key_Home:
-        navigateTo(m_navigator.firstPath());
+        if (!m_navigator.imagePaths().isEmpty()) {
+            navigateTo(m_navigator.firstPath());
+        }
         event->accept();
         return;
     case Qt::Key_End:
-        navigateTo(m_navigator.lastPath());
+        if (!m_navigator.imagePaths().isEmpty()) {
+            navigateTo(m_navigator.lastPath());
+        }
         event->accept();
         return;
     case Qt::Key_F11:
@@ -144,9 +161,15 @@ bool MainWindow::eventFilter(QObject *watched, QEvent *event)
     return keyEvent->isAccepted();
 }
 
-void MainWindow::navigateTo(const QString &imagePath)
+void MainWindow::navigateTo(
+    const QString &imagePath,
+    bool forceReload
+)
 {
-    if (imagePath == m_navigator.currentPath()) {
+    if (imagePath.isEmpty()) {
+        return;
+    }
+    if (!forceReload && imagePath == m_navigator.currentPath()) {
         return;
     }
 
@@ -174,6 +197,7 @@ void MainWindow::navigateTo(const QString &imagePath)
     }
 
     m_imageView->setImage(image, imagePath);
+    m_directoryWatcher->setDirectory(m_navigator.directoryPath());
     if (m_navigator.imagePaths() != previousPaths) {
         m_thumbnailRibbon->setImages(
             m_navigator.imagePaths(),
@@ -184,6 +208,44 @@ void MainWindow::navigateTo(const QString &imagePath)
     }
     setWindowTitle(QFileInfo(imagePath).fileName() + " - cbimgv");
     updateImageStatus(image, imagePath);
+}
+
+void MainWindow::refreshDirectory()
+{
+    if (m_directoryWatcher->directory()
+        != m_navigator.directoryPath()) {
+        m_directoryWatcher->setDirectory(m_navigator.directoryPath());
+    }
+
+    const QStringList previousPaths = m_navigator.imagePaths();
+    const bool selectionChanged = m_navigator.refresh();
+    const QStringList refreshedPaths = m_navigator.imagePaths();
+
+    if (refreshedPaths.isEmpty()) {
+        m_imageView->clearImage();
+        m_thumbnailRibbon->setImages({}, -1);
+        setWindowTitle("cbimgv");
+        m_fileNameLabel->clear();
+        m_dimensionsLabel->clear();
+        m_zoomLabel->clear();
+        return;
+    }
+
+    if (selectionChanged) {
+        navigateTo(m_navigator.currentPath(), true);
+        return;
+    }
+
+    if (refreshedPaths != previousPaths) {
+        m_thumbnailRibbon->setImages(
+            refreshedPaths,
+            m_navigator.currentIndex()
+        );
+    } else {
+        m_thumbnailRibbon->setSelectedIndex(
+            m_navigator.currentIndex()
+        );
+    }
 }
 
 void MainWindow::updateImageStatus(

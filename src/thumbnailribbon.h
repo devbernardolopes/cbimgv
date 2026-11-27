@@ -3,6 +3,7 @@
 #include <QCache>
 #include <QImage>
 #include <QListWidget>
+#include <QHash>
 #include <QString>
 #include <QStringList>
 #include <QWidget>
@@ -37,6 +38,7 @@ private slots:
 private:
     void loadThumbnail(const QString &path);
     void centerSelectedThumbnail();
+    void invalidateChangedCache(const QStringList &paths);
 
     QListWidget *m_list = nullptr;
     QPushButton *m_previousButton = nullptr;
@@ -44,4 +46,5 @@ private:
     QStringList m_paths;
     qsizetype m_selectedIndex = -1;
     QCache<QString, QImage> m_thumbnailCache;
+    QHash<QString, QString> m_thumbnailStamps;
 };

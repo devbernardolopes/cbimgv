@@ -23,6 +23,7 @@ public:
     );
 
     void setImage(const QImage &image, const QString &imagePath);
+    void clearImage();
     void fitToWindow();
     void showOriginalSize();
     qreal zoomPercentage() const;

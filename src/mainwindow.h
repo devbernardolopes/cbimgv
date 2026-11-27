@@ -11,6 +11,7 @@ class QEvent;
 class ImageView;
 class QLabel;
 class ThumbnailRibbon;
+class DirectoryWatcher;
 class QWidget;
 
 class MainWindow : public QMainWindow
@@ -27,13 +28,15 @@ protected:
     bool eventFilter(QObject *watched, QEvent *event) override;
 
 private:
-    void navigateTo(const QString &imagePath);
+    void navigateTo(const QString &imagePath, bool forceReload = false);
+    void refreshDirectory();
     void updateImageStatus(const QImage &image, const QString &imagePath);
     void updateZoomStatus(qreal percentage);
 
     ImageNavigator m_navigator;
     ImageView *m_imageView = nullptr;
     ThumbnailRibbon *m_thumbnailRibbon = nullptr;
+    DirectoryWatcher *m_directoryWatcher = nullptr;
     QLabel *m_fileNameLabel = nullptr;
     QLabel *m_dimensionsLabel = nullptr;
     QLabel *m_zoomLabel = nullptr;
