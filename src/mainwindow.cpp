@@ -2,6 +2,8 @@
 #include "imageview.h"
 #include "thumbnailribbon.h"
 
+#include <QApplication>
+#include <QEvent>
 #include <QFileInfo>
 #include <QImageReader>
 #include <QKeyEvent>
@@ -28,6 +30,7 @@ MainWindow::MainWindow(
         m_navigator.imagePaths(),
         m_navigator.currentIndex()
     );
+    QApplication::instance()->installEventFilter(this);
 
     auto *centralContainer = new QWidget(this);
     auto *centralLayout = new QVBoxLayout(centralContainer);
@@ -122,6 +125,23 @@ void MainWindow::keyPressEvent(QKeyEvent *event)
     default:
         QMainWindow::keyPressEvent(event);
     }
+}
+
+bool MainWindow::eventFilter(QObject *watched, QEvent *event)
+{
+    if (event->type() != QEvent::KeyPress) {
+        return QMainWindow::eventFilter(watched, event);
+    }
+
+    auto *widget = qobject_cast<QWidget *>(watched);
+    if (watched != this
+        && (!widget || (widget != this && !isAncestorOf(widget)))) {
+        return QMainWindow::eventFilter(watched, event);
+    }
+
+    auto *keyEvent = static_cast<QKeyEvent *>(event);
+    keyPressEvent(keyEvent);
+    return keyEvent->isAccepted();
 }
 
 void MainWindow::navigateTo(const QString &imagePath)

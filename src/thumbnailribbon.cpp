@@ -77,8 +77,8 @@ ThumbnailRibbon::ThumbnailRibbon(QWidget *parent)
     m_nextButton = new QPushButton(QStringLiteral(">"), this);
     m_previousButton->setFixedSize(28, 56);
     m_nextButton->setFixedSize(28, 56);
-    m_previousButton->setToolTip(tr("Previous image"));
-    m_nextButton->setToolTip(tr("Next image"));
+    m_previousButton->setFocusPolicy(Qt::NoFocus);
+    m_nextButton->setFocusPolicy(Qt::NoFocus);
 
     m_list = new QListWidget(this);
     m_list->setFlow(QListView::LeftToRight);
@@ -87,6 +87,7 @@ ThumbnailRibbon::ThumbnailRibbon(QWidget *parent)
     m_list->setHorizontalScrollBarPolicy(Qt::ScrollBarAsNeeded);
     m_list->setIconSize(QSize(ThumbnailWidth, ThumbnailHeight));
     m_list->setSelectionMode(QAbstractItemView::SingleSelection);
+    m_list->setFocusPolicy(Qt::NoFocus);
     m_list->setItemDelegate(new ThumbnailDelegate);
     m_list->setUniformItemSizes(true);
     m_list->setFixedHeight(64);
@@ -125,7 +126,6 @@ void ThumbnailRibbon::setImages(
     for (const QString &path : m_paths) {
         auto *item = new QListWidgetItem;
         item->setSizeHint(QSize(ItemWidth, ItemHeight));
-        item->setToolTip(path);
         if (const QImage *thumbnail = m_thumbnailCache.object(path)) {
             item->setIcon(QPixmap::fromImage(*thumbnail));
         }

@@ -7,6 +7,7 @@
 #include <QString>
 
 class QKeyEvent;
+class QEvent;
 class ImageView;
 class QLabel;
 class ThumbnailRibbon;
@@ -23,6 +24,7 @@ public:
 
 protected:
     void keyPressEvent(QKeyEvent *event) override;
+    bool eventFilter(QObject *watched, QEvent *event) override;
 
 private:
     void navigateTo(const QString &imagePath);
