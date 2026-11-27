@@ -66,7 +66,7 @@ private:
     QPointF m_panOffset;
     bool m_fitToWindow = true;
     bool m_isPanning = false;
-    bool m_wheelNavigatesImages = false;
+    bool m_wheelNavigatesImages = true;
     qreal m_wheelNavigationRemainder = 0.0;
     QPointF m_lastPanPosition;
     bool m_isDragCandidate = false;
