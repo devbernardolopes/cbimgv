@@ -28,6 +28,7 @@ protected:
     bool eventFilter(QObject *watched, QEvent *event) override;
 
 private:
+    void deleteCurrentImage(bool permanently);
     void navigateTo(const QString &imagePath, bool forceReload = false);
     void refreshDirectory();
     void updateImageStatus(const QImage &image, const QString &imagePath);

@@ -169,8 +169,13 @@ bool ImageNavigator::refresh()
         return false;
     }
 
-    const qsizetype fallbackIndex =
-        std::clamp(previousIndex, qsizetype(0), m_imagePaths.size() - 1);
+    const qsizetype preferredIndex =
+        previousIndex > 0 ? previousIndex - 1 : 0;
+    const qsizetype fallbackIndex = std::clamp(
+        preferredIndex,
+        qsizetype(0),
+        m_imagePaths.size() - 1
+    );
     m_currentIndex = fallbackIndex;
     return true;
 }

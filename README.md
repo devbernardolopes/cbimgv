@@ -12,9 +12,11 @@ does not need panning, it can also be dragged to another application as a file,
 with a thumbnail shown beside the cursor. Ctrl+C copies both the image and its
 file reference for pasting into other applications.
 
-## Keyboard navigation
+## Keyboard shortcuts
 
 - Ctrl+C: copy the current image and its file reference.
+- Delete: move the current image to Trash.
+- Shift+Delete: permanently delete the current image.
 - Left/Right: move to the previous/next image, wrapping at either end.
 - Page Up/Page Down: move back/forward 10 images, clamping to the first or
   last image. From the first/last image, the shortcut wraps by 10 instead.

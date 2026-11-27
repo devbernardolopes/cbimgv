@@ -5,6 +5,7 @@
 
 #include <QApplication>
 #include <QEvent>
+#include <QFile>
 #include <QFileInfo>
 #include <QImageReader>
 #include <QKeyEvent>
@@ -105,6 +106,14 @@ void MainWindow::keyPressEvent(QKeyEvent *event)
         return;
     }
 
+    if (event->key() == Qt::Key_Delete
+        && (event->modifiers() == Qt::NoModifier
+            || event->modifiers() == Qt::ShiftModifier)) {
+        deleteCurrentImage(event->modifiers() == Qt::ShiftModifier);
+        event->accept();
+        return;
+    }
+
     switch (event->key()) {
     case Qt::Key_Escape:
         close();
@@ -157,6 +166,34 @@ void MainWindow::keyPressEvent(QKeyEvent *event)
     default:
         QMainWindow::keyPressEvent(event);
     }
+}
+
+void MainWindow::deleteCurrentImage(bool permanently)
+{
+    const QString imagePath = m_navigator.currentPath();
+    if (imagePath.isEmpty()) {
+        return;
+    }
+
+    QFile file(imagePath);
+    const bool succeeded = permanently
+        ? file.remove()
+        : file.moveToTrash();
+    if (!succeeded) {
+        QMessageBox::warning(
+            this,
+            "cbimgv",
+            QString("Could not %1 image:\n\n%2\n\n%3")
+                .arg(
+                    permanently ? "permanently delete" : "move to Trash",
+                    imagePath,
+                    file.errorString()
+                )
+        );
+        return;
+    }
+
+    refreshDirectory();
 }
 
 bool MainWindow::eventFilter(QObject *watched, QEvent *event)
@@ -247,6 +284,10 @@ void MainWindow::refreshDirectory()
     }
 
     if (selectionChanged) {
+        m_thumbnailRibbon->setImages(
+            refreshedPaths,
+            m_navigator.currentIndex()
+        );
         navigateTo(m_navigator.currentPath(), true);
         return;
     }
