@@ -17,17 +17,24 @@ file reference for pasting into other applications.
 - Ctrl+C: copy the current image and its file reference.
 - Delete: move the current image to Trash.
 - Shift+Delete: permanently delete the current image.
+- F11: toggle fullscreen.
 - Tab: toggle the mouse wheel between zooming and image navigation (up for
   previous, down for next).
+- F: fit the image to the window.
+- 1: show the image at original size (100%).
 - Ctrl+mouse wheel: zoom regardless of the current wheel mode.
 - G: toggle the thumbnail ribbon.
 - S: toggle the status bar.
+- Esc: close cbimgv.
 - Plus/Minus: zoom in/out.
 - Right-click: quit cbimgv.
 - Left/Right: move to the previous/next image, wrapping at either end.
 - Page Up/Page Down: move back/forward 10 images, clamping to the first or
   last image. From the first/last image, the shortcut wraps by 10 instead.
 - Home/End: select the first/last image.
+
+The footer also provides buttons for these shortcuts. Toggle buttons reflect
+their current state and can be clicked directly.
 
 ## Technologies
 

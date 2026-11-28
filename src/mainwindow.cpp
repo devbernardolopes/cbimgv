@@ -7,11 +7,15 @@
 #include <QEvent>
 #include <QFile>
 #include <QFileInfo>
+#include <QHBoxLayout>
 #include <QImageReader>
 #include <QKeyEvent>
 #include <QKeySequence>
 #include <QLabel>
+#include <QList>
 #include <QMouseEvent>
+#include <QPushButton>
+#include <QSizePolicy>
 #include <QVBoxLayout>
 #include <QWidget>
 #include <QMessageBox>
@@ -44,14 +48,92 @@ MainWindow::MainWindow(
     centralLayout->setSpacing(0);
     centralLayout->addWidget(m_imageView, 1);
     centralLayout->addWidget(m_thumbnailRibbon, 0);
+
+    auto *footer = new QWidget(centralContainer);
+    auto *footerLayout = new QHBoxLayout(footer);
+    footerLayout->setContentsMargins(0, 0, 0, 0);
+    footerLayout->setSpacing(0);
+
+    const auto createButton = [footer](const QString &label, bool checkable) {
+        auto *button = new QPushButton(label, footer);
+        button->setCheckable(checkable);
+        return button;
+    };
+
+    m_fullscreenButton = createButton("F11", true);
+    m_wheelNavigationButton = createButton("Tab", true);
+    auto *fitButton = createButton("F", false);
+    auto *originalSizeButton = createButton("1", false);
+    m_thumbnailRibbonButton = createButton("G", true);
+    m_statusBarButton = createButton("S", true);
+    auto *closeButton = createButton("Esc", false);
+    const QList<QPushButton *> buttons = {
+        m_fullscreenButton,
+        m_wheelNavigationButton,
+        fitButton,
+        originalSizeButton,
+        m_thumbnailRibbonButton,
+        m_statusBarButton,
+        closeButton
+    };
+
+    m_fileNameLabel = new QLabel;
+    m_dimensionsLabel = new QLabel;
+    m_zoomLabel = new QLabel;
+    m_statusBar = new QStatusBar(footer);
+    m_statusBar->addWidget(m_fileNameLabel, 1);
+    m_statusBar->addPermanentWidget(m_dimensionsLabel);
+    m_statusBar->addPermanentWidget(m_zoomLabel);
+    m_statusBar->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
+
+    int buttonWidth = 0;
+    for (QPushButton *button : buttons) {
+        buttonWidth = qMax(buttonWidth, button->sizeHint().width());
+    }
+    const int buttonHeight = m_statusBar->sizeHint().height();
+    for (QPushButton *button : buttons) {
+        button->setFixedSize(buttonWidth, buttonHeight);
+        if (button == closeButton) {
+            footerLayout->addWidget(m_statusBar, 1);
+        }
+        footerLayout->addWidget(button);
+    }
+    footer->setFixedHeight(buttonHeight);
+    centralLayout->addWidget(footer);
     setCentralWidget(centralContainer);
 
-    m_fileNameLabel = new QLabel(this);
-    m_dimensionsLabel = new QLabel(this);
-    m_zoomLabel = new QLabel(this);
-    statusBar()->addWidget(m_fileNameLabel, 1);
-    statusBar()->addPermanentWidget(m_dimensionsLabel);
-    statusBar()->addPermanentWidget(m_zoomLabel);
+    connect(
+        m_fullscreenButton,
+        &QPushButton::clicked,
+        this,
+        &MainWindow::toggleFullscreen
+    );
+    connect(
+        m_wheelNavigationButton,
+        &QPushButton::clicked,
+        this,
+        &MainWindow::toggleWheelNavigation
+    );
+    connect(fitButton, &QPushButton::clicked, m_imageView, &ImageView::fitToWindow);
+    connect(
+        originalSizeButton,
+        &QPushButton::clicked,
+        m_imageView,
+        &ImageView::showOriginalSize
+    );
+    connect(
+        m_thumbnailRibbonButton,
+        &QPushButton::clicked,
+        this,
+        &MainWindow::toggleThumbnailRibbon
+    );
+    connect(
+        m_statusBarButton,
+        &QPushButton::clicked,
+        this,
+        &MainWindow::toggleStatusBar
+    );
+    connect(closeButton, &QPushButton::clicked, this, &MainWindow::close);
 
     connect(
         m_imageView,
@@ -97,6 +179,7 @@ MainWindow::MainWindow(
     );
     updateImageStatus(image, imagePath);
     updateZoomStatus(m_imageView->zoomPercentage());
+    updateToggleButtons();
 }
 
 void MainWindow::keyPressEvent(QKeyEvent *event)
@@ -122,18 +205,18 @@ void MainWindow::keyPressEvent(QKeyEvent *event)
         return;
     case Qt::Key_Tab:
         if (event->modifiers() == Qt::NoModifier) {
-            m_imageView->toggleWheelNavigation();
+            toggleWheelNavigation();
             event->accept();
             return;
         }
         QMainWindow::keyPressEvent(event);
         return;
     case Qt::Key_G:
-        m_thumbnailRibbon->setVisible(m_thumbnailRibbon->isHidden());
+        toggleThumbnailRibbon();
         event->accept();
         return;
     case Qt::Key_S:
-        statusBar()->setVisible(statusBar()->isHidden());
+        toggleStatusBar();
         event->accept();
         return;
     case Qt::Key_Plus:
@@ -186,7 +269,7 @@ void MainWindow::keyPressEvent(QKeyEvent *event)
         event->accept();
         return;
     case Qt::Key_F11:
-        isFullScreen() ? showNormal() : showFullScreen();
+        toggleFullscreen();
         event->accept();
         return;
     case Qt::Key_F:
@@ -200,6 +283,54 @@ void MainWindow::keyPressEvent(QKeyEvent *event)
     default:
         QMainWindow::keyPressEvent(event);
     }
+}
+
+void MainWindow::changeEvent(QEvent *event)
+{
+    QMainWindow::changeEvent(event);
+    if (event->type() == QEvent::WindowStateChange) {
+        updateToggleButtons();
+    }
+}
+
+void MainWindow::toggleFullscreen()
+{
+    isFullScreen() ? showNormal() : showFullScreen();
+    updateToggleButtons();
+}
+
+void MainWindow::toggleWheelNavigation()
+{
+    m_imageView->toggleWheelNavigation();
+    updateToggleButtons();
+}
+
+void MainWindow::toggleThumbnailRibbon()
+{
+    m_thumbnailRibbon->setVisible(m_thumbnailRibbon->isHidden());
+    updateToggleButtons();
+}
+
+void MainWindow::toggleStatusBar()
+{
+    m_statusBar->setVisible(m_statusBar->isHidden());
+    updateToggleButtons();
+}
+
+void MainWindow::updateToggleButtons()
+{
+    if (!m_fullscreenButton || !m_wheelNavigationButton
+        || !m_thumbnailRibbonButton || !m_statusBarButton
+        || !m_imageView || !m_thumbnailRibbon || !m_statusBar) {
+        return;
+    }
+
+    m_fullscreenButton->setChecked(isFullScreen());
+    m_wheelNavigationButton->setChecked(
+        m_imageView->wheelNavigatesImages()
+    );
+    m_thumbnailRibbonButton->setChecked(!m_thumbnailRibbon->isHidden());
+    m_statusBarButton->setChecked(!m_statusBar->isHidden());
 }
 
 void MainWindow::deleteCurrentImage(bool permanently)

@@ -12,6 +12,8 @@ class ImageView;
 class QLabel;
 class ThumbnailRibbon;
 class DirectoryWatcher;
+class QPushButton;
+class QStatusBar;
 class QWidget;
 
 class MainWindow : public QMainWindow
@@ -25,9 +27,15 @@ public:
 
 protected:
     void keyPressEvent(QKeyEvent *event) override;
+    void changeEvent(QEvent *event) override;
     bool eventFilter(QObject *watched, QEvent *event) override;
 
 private:
+    void toggleFullscreen();
+    void toggleWheelNavigation();
+    void toggleThumbnailRibbon();
+    void toggleStatusBar();
+    void updateToggleButtons();
     void deleteCurrentImage(bool permanently);
     void navigateTo(const QString &imagePath, bool forceReload = false);
     void refreshDirectory();
@@ -41,4 +49,9 @@ private:
     QLabel *m_fileNameLabel = nullptr;
     QLabel *m_dimensionsLabel = nullptr;
     QLabel *m_zoomLabel = nullptr;
+    QStatusBar *m_statusBar = nullptr;
+    QPushButton *m_fullscreenButton = nullptr;
+    QPushButton *m_wheelNavigationButton = nullptr;
+    QPushButton *m_thumbnailRibbonButton = nullptr;
+    QPushButton *m_statusBarButton = nullptr;
 };

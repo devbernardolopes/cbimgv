@@ -115,6 +115,11 @@ void ImageView::toggleWheelNavigation()
     m_wheelNavigationRemainder = 0.0;
 }
 
+bool ImageView::wheelNavigatesImages() const
+{
+    return m_wheelNavigatesImages;
+}
+
 void ImageView::copyToClipboard() const
 {
     if (m_image.isNull() || m_imagePath.isEmpty()) {
