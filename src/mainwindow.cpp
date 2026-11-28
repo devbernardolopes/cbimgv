@@ -376,6 +376,11 @@ bool MainWindow::eventFilter(QObject *watched, QEvent *event)
             mouseEvent->accept();
             return true;
         }
+        if (mouseEvent->button() == Qt::MiddleButton) {
+            toggleWheelNavigation();
+            mouseEvent->accept();
+            return true;
+        }
     } else if (event->type() == QEvent::KeyPress) {
         auto *keyEvent = static_cast<QKeyEvent *>(event);
         keyPressEvent(keyEvent);

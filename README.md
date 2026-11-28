@@ -20,6 +20,8 @@ file reference for pasting into other applications.
 - F11: toggle fullscreen.
 - Tab: toggle the mouse wheel between zooming and image navigation (up for
   previous, down for next).
+- Middle-click (press the scroll wheel): toggle between wheel zoom and image
+  navigation.
 - F: fit the image to the window.
 - 1: show the image at original size (100%).
 - Ctrl+mouse wheel: zoom regardless of the current wheel mode.
