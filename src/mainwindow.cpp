@@ -78,13 +78,29 @@ MainWindow::MainWindow(
     };
 
     m_fileNameLabel = new QLabel;
+    m_fileNameLabel->setMinimumWidth(0);
+    m_fileNameLabel->setSizePolicy(
+        QSizePolicy::Ignored,
+        QSizePolicy::Preferred
+    );
     m_dimensionsLabel = new QLabel;
+    m_dimensionsLabel->setMinimumWidth(0);
+    m_dimensionsLabel->setSizePolicy(
+        QSizePolicy::Ignored,
+        QSizePolicy::Preferred
+    );
     m_zoomLabel = new QLabel;
+    m_zoomLabel->setMinimumWidth(0);
+    m_zoomLabel->setSizePolicy(
+        QSizePolicy::Ignored,
+        QSizePolicy::Preferred
+    );
     m_statusBar = new QStatusBar(footer);
     m_statusBar->addWidget(m_fileNameLabel, 1);
     m_statusBar->addPermanentWidget(m_dimensionsLabel);
     m_statusBar->addPermanentWidget(m_zoomLabel);
-    m_statusBar->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
+    m_statusBar->setMinimumWidth(0);
+    m_statusBar->setSizePolicy(QSizePolicy::Ignored, QSizePolicy::Fixed);
 
     int buttonWidth = 0;
     for (QPushButton *button : buttons) {
