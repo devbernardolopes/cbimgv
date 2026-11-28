@@ -27,7 +27,7 @@ file reference for pasting into other applications.
 - Ctrl+mouse wheel: zoom regardless of the current wheel mode.
 - G: toggle the thumbnail ribbon.
 - S: toggle the status bar.
-- Esc: close cbimgv.
+- Esc/Q: close cbimgv.
 - Plus/Minus: zoom in/out.
 - Right-click: quit cbimgv.
 - Left/Right: move to the previous/next image, wrapping at either end.

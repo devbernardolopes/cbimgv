@@ -200,6 +200,7 @@ void MainWindow::keyPressEvent(QKeyEvent *event)
 
     switch (event->key()) {
     case Qt::Key_Escape:
+    case Qt::Key_Q:
         close();
         event->accept();
         return;

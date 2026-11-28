@@ -16,11 +16,12 @@
 
 namespace
 {
-constexpr int RibbonHeight = 72;
+constexpr int BonusHeight = 32;
+constexpr int RibbonHeight = 72 + BonusHeight;
 constexpr int ThumbnailWidth = 80;
-constexpr int ThumbnailHeight = 56;
+constexpr int ThumbnailHeight = 56 + BonusHeight;
 constexpr int ItemWidth = 88;
-constexpr int ItemHeight = 64;
+constexpr int ItemHeight = 64 + BonusHeight;
 
 class ThumbnailDelegate : public QAbstractItemDelegate
 {
@@ -79,8 +80,8 @@ ThumbnailRibbon::ThumbnailRibbon(QWidget *parent)
 
     m_previousButton = new QPushButton(QStringLiteral("<"), this);
     m_nextButton = new QPushButton(QStringLiteral(">"), this);
-    m_previousButton->setFixedSize(28, 56);
-    m_nextButton->setFixedSize(28, 56);
+    m_previousButton->setFixedSize(28, 56 + BonusHeight);
+    m_nextButton->setFixedSize(28, 56 + BonusHeight);
     m_previousButton->setFocusPolicy(Qt::NoFocus);
     m_nextButton->setFocusPolicy(Qt::NoFocus);
 
@@ -94,7 +95,7 @@ ThumbnailRibbon::ThumbnailRibbon(QWidget *parent)
     m_list->setFocusPolicy(Qt::NoFocus);
     m_list->setItemDelegate(new ThumbnailDelegate);
     m_list->setUniformItemSizes(true);
-    m_list->setFixedHeight(64);
+    m_list->setFixedHeight(64 + BonusHeight);
 
     layout->addWidget(m_previousButton);
     layout->addWidget(m_list, 1);
