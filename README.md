@@ -1,101 +1,112 @@
 # cbimgv
 
-cbimgv is a lightweight image viewer for Linux. It opens one image directly
-from a command-line path and provides minimal viewing and directory navigation
-controls.
+cbimgv is a lightweight image viewer for Linux desktops, built with Qt 6
+Widgets. Open an image directly from a file manager or the command line, then
+view and navigate images in the same directory.
 
-## Current status
+## Features
 
-This project is in active development. It currently uses Qt Widgets to open,
-display, zoom, pan, and navigate images in the same directory. When the image
-does not need panning, it can also be dragged to another application as a file,
-with a thumbnail shown beside the cursor. Ctrl+C copies both the image and its
-file reference for pasting into other applications.
+- Fit images to the window, view them at original size, zoom, and pan.
+- Navigate through supported images in the current directory, with natural
+  filename sorting and wraparound navigation.
+- Browse nearby files with an optional thumbnail ribbon.
+- Show the filename, image dimensions, and zoom level in a compact status area.
+- Refresh the directory listing when its contents change.
+- Drag an image to another application or copy the image and its file
+  reference to the clipboard.
+- Move an image to Trash or permanently delete it from the viewer.
+- Integrate with Linux desktops through a freedesktop-compatible application
+  entry and icon.
 
-## Keyboard shortcuts
+Image formats depend on the Qt image-format plugins installed on the system.
+Qt's built-in formats cover common types; additional formats, including SVG,
+WebP, and TIFF, may require the corresponding Qt plugin packages.
 
-- Ctrl+C: copy the current image and its file reference.
-- Delete: move the current image to Trash.
-- Shift+Delete: permanently delete the current image.
-- F11: toggle fullscreen.
-- Tab: toggle the mouse wheel between zooming and image navigation (up for
-  previous, down for next).
-- Middle-click (press the scroll wheel): toggle between wheel zoom and image
-  navigation.
-- F: fit the image to the window.
-- 1: show the image at original size (100%).
-- Ctrl+mouse wheel: zoom regardless of the current wheel mode.
-- G: toggle the thumbnail ribbon.
-- S: toggle the status bar.
-- Esc/Q: close cbimgv.
-- Plus/Minus: zoom in/out.
-- Right-click: quit cbimgv.
-- Left/Right: move to the previous/next image, wrapping at either end.
-- Page Up/Page Down: move back/forward 10 images, clamping to the first or
-  last image. From the first/last image, the shortcut wraps by 10 instead.
-- Home/End: select the first/last image.
+## Usage
 
-The footer also provides buttons for these shortcuts. Toggle buttons reflect
-their current state and can be clicked directly.
+Open an image from the command line:
 
-## Technologies
+```sh
+cbimgv /path/to/image.jpg
+```
 
-- C++17
-- Qt 6 Widgets
-- CMake
-- Ninja
+The application can also be selected as the handler for image files in a
+desktop file manager. The included desktop entry advertises common image MIME
+types. Choosing cbimgv as the default handler is controlled by the desktop
+environment and does not change existing file associations automatically.
+
+## Controls
+
+| Input | Action |
+| --- | --- |
+| Left / Right | Previous / next image; wraps at either end |
+| Home / End | First / last image |
+| Page Up / Page Down | Move by 10 images; wraps when already at the corresponding end |
+| Mouse wheel | Zoom in / out |
+| Tab or middle-click | Toggle wheel navigation (up for previous, down for next) |
+| Ctrl + mouse wheel | Zoom regardless of the wheel-navigation mode |
+| Left / right edge click | Previous / next image |
+| Drag | Drag the current image to another application when it is not being panned |
+| Ctrl + C | Copy the image and its file reference |
+| F | Fit image to the window |
+| 1 | Show image at original size (100%) |
+| Double-click | Toggle between fit-to-window and original size |
+| Plus / Minus | Zoom in / out |
+| G | Toggle the thumbnail ribbon |
+| S | Toggle the status area |
+| F11 | Toggle fullscreen |
+| Delete | Move the current image to Trash |
+| Shift + Delete | Permanently delete the current image |
+| Esc, Q, or right-click | Close cbimgv |
+
+The footer also contains buttons for several viewing controls. Deletion by
+Shift + Delete is permanent.
 
 ## Build
 
-Configure and build with CMake and Ninja:
+Requirements:
 
-```bash
+- C++17 compiler
+- CMake 3.21 or newer
+- Ninja
+- Qt 6 Widgets development files
+
+Configure and build from the repository root:
+
+```sh
 cmake -S . -B build -G Ninja -DCMAKE_BUILD_TYPE=Release
 cmake --build build
 ```
 
-## Installation
+Run the locally built application:
 
-To install into the configured prefix:
-
-```bash
-cmake --install build
+```sh
+./build/cbimgv /path/to/image.jpg
 ```
 
-For a staged installation, for example to package for a distribution:
+## Install
 
-```bash
-DESTDIR=/tmp/cbimgv-package cmake --install build
+To install into a user-local prefix:
+
+```sh
+cmake --install build --prefix "$HOME/.local"
 ```
 
-For a `/usr` prefix:
+Ensure `$HOME/.local/bin` is on your `PATH` to launch `cbimgv` by name. To
+install system-wide, choose an appropriate prefix such as `/usr` and use the
+installation method provided by your distribution. Do not run the build itself
+with elevated privileges.
 
-```bash
-cmake -S . -B build -G Ninja \
-  -DCMAKE_BUILD_TYPE=Release \
-  -DCMAKE_INSTALL_PREFIX=/usr
-cmake --build build
-DESTDIR=/tmp/cbimgv-package cmake --install build
-```
+## Arch Linux
 
-Do not use privileged installation commands merely to build or stage the
-package.
-
-## Desktop integration
-
-cbimgv provides a freedesktop-compatible desktop entry and application icon.
-The desktop entry declares MIME types for common image formats, allowing Linux
-desktop environments and file managers to offer cbimgv as an available handler.
-The user or desktop environment chooses the default application; installing
-cbimgv does not change existing MIME defaults or per-user preferences.
-
-## Arch Linux packaging
-
-An experimental PKGBUILD is prepared under `packaging/arch/`. It is not yet
-published to the Arch User Repository (AUR).
+An Arch Linux PKGBUILD is maintained in [`packaging/arch/PKGBUILD`](packaging/arch/PKGBUILD).
+It builds from a versioned GitHub source archive. The package recipe is not yet
+published to the AUR; a tagged source release and a verified source checksum
+are required before publication. An AUR submission also needs the packaging
+sources' 0BSD license and REUSE metadata, separate from cbimgv's Apache
+application license.
 
 ## License
 
-The project is intended to be licensed under Apache-2.0. The complete license
-text still needs to be inserted into `LICENSE` before this project is treated
-as licensed or published as a distributable release.
+cbimgv is distributed under the Apache License 2.0. See [`LICENSE`](LICENSE)
+for the complete license text.

@@ -230,10 +230,9 @@ void ImageView::mouseDoubleClickEvent(QMouseEvent *event)
 {
     if (event->button() == Qt::LeftButton) {
         const EdgeNavigation edge = edgeNavigationAt(event->position().x());
-        if (edge == EdgeNavigation::Previous) {
-            emit previousImageRequested();
-        } else if (edge == EdgeNavigation::Next) {
-            emit nextImageRequested();
+        if (edge != EdgeNavigation::None) {
+            m_pressedEdgeNavigation = EdgeNavigation::None;
+            m_isDragCandidate = false;
         } else if (m_fitToWindow) {
             showOriginalSize();
         } else {

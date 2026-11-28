@@ -1,7 +1,4 @@
-# Maintainer: TBD
-
-# TODO: Before publication, set pkgver to the actual release version and
-# source to the corresponding Git tag/release archive.
+# Maintainer: Bernardo Crivellaro Lopes <bernardocrivellaro@gmail.com>
 pkgname=cbimgv
 pkgver=0.1.0
 pkgrel=1
@@ -11,15 +8,15 @@ url='https://github.com/devbernardolopes/cbimgv'
 license=('Apache-2.0')
 depends=('qt6-base')
 makedepends=('cmake' 'ninja')
-
-# TODO: Replace this placeholder before publication. Use the SHA-256 checksum
-# of the verified GitHub release archive for tag v0.1.0.
-source=("https://github.com/devbernardolopes/cbimgv/archive/refs/tags/v${pkgver}.tar.gz")
-sha256sums=('SKIP')
+optdepends=('qt6-imageformats: WebP, TIFF and other extra image formats'
+            'qt6-svg: SVG image support'
+            'qt6-wayland: native Wayland support')
+source=("$pkgname-$pkgver.tar.gz::$url/archive/refs/tags/v$pkgver.tar.gz")
+sha256sums=('SKIP')  # replace via: updatepkgsums
 
 build() {
   cmake -S "$pkgname-$pkgver" -B build -G Ninja \
-    -DCMAKE_BUILD_TYPE=Release \
+    -DCMAKE_BUILD_TYPE=None \
     -DCMAKE_INSTALL_PREFIX=/usr
   cmake --build build
 }

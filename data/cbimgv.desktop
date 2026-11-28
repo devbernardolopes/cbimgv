@@ -1,10 +1,12 @@
 [Desktop Entry]
 Type=Application
 Name=cbimgv
+GenericName=Image Viewer
 Comment=View and navigate images
 Exec=cbimgv %f
 TryExec=cbimgv
 Icon=cbimgv
 Terminal=false
 Categories=Graphics;Viewer;
+Keywords=image;picture;photo;viewer;
 MimeType=image/jpeg;image/png;image/gif;image/webp;image/bmp;image/tiff;image/svg+xml;

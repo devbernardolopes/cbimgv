@@ -9,3 +9,8 @@ cmake-build-*/
 *.o
 *.a
 *.so
+
+packaging/arch/src/
+packaging/arch/pkg/
+packaging/arch/build/
+packaging/arch/*.pkg.tar.*
